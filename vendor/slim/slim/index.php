@@ -38,8 +38,9 @@ $app->get('/', function () {
 });
 
 $app->get('/product/kode=:code&nama=:name', function ($code,$name) { 
-    echo "<p>Code : $code<p>"; 
-    echo "<p>Product Name : $name<p>";
+    echo "Kode            : $code<br>"; 
+    echo "Kategori Produk : $name<br>";
+    echo "Nama Produk     : $name<br>";
 });
 
 function getConnection() {
@@ -69,7 +70,7 @@ $authKey = function ($route) {
     }
 };
 
-$app->get('/customer/:key/', $authKey, function() use ($app)
+$app->get('/customer/:key', $authKey, function() use ($app)
 {
     $sql = "select * FROM tbl_customer";
 
@@ -94,7 +95,7 @@ $app->get('/customer/:key/', $authKey, function() use ($app)
     }
 });
 
-$app->get('/customer/:key/:id/', $authKey, function($key, $id) use ($app) {
+$app->get('/customer/:key/:id', $authKey, function($key, $id) use ($app) {
     try {
         $sql  = "select * FROM tbl_customer where id_customer = '".$id."'";
         $db   = getConnection();
@@ -111,6 +112,22 @@ $app->get('/customer/:key/:id/', $authKey, function($key, $id) use ($app) {
     }
 });
 
+$app->get('/customer/:key/:name', $authKey, function($key, $name) use ($app) {
+    try {
+        $sql  = "select * FROM tbl_customer where nama_customer = '".$name."'";
+        $db   = getConnection();
+        $stmt = $db->query($sql);
+        $data = $stmt->fetch(PDO::FETCH_OBJ);
+
+        $db   = null;
+        $app->response()->header('Content-Type', 'application/json');
+        echo json_encode($data);
+
+    } catch (Exception $e) {
+        $app->response()->status(400);
+        $app->response()->header('X-Status-Reason', $e->getMessage());
+    }
+});
 
 // POST route  ---->>>>>>> Untuk INSERT atau memasukkan data (ex: ke dalam tabel pada database)
 /*$app->post(
